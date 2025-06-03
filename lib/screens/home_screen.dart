@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
             subtitle: Text("Descripción del servicio 1"),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () {
-              /// Navegación por nombre
+              /// Navegación por nombre "/details"
               Navigator.pushNamed(context, DetailsScreen.routeName);
             },
           ),

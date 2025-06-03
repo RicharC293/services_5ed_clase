@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:servicios_app/screens/create_service_screen.dart';
 import 'package:servicios_app/screens/details_screen.dart';
 import 'package:servicios_app/screens/home_screen.dart';
 
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         HomeScreen.routeName: (context) => HomeScreen(),
         // Agregar todas rutas de las otras pantallas
         DetailsScreen.routeName: (context) => DetailsScreen(),
+        CreateServiceScreen.routeName: (context) => CreateServiceScreen(),
       },
     );
   }
