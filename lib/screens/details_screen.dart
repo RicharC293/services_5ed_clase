@@ -24,9 +24,9 @@ class DetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+             Text(
               "Nombre del Servicio",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             const Text(

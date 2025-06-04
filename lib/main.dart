@@ -20,6 +20,16 @@ class MyApp extends StatelessWidget {
         DetailsScreen.routeName: (context) => DetailsScreen(),
         CreateServiceScreen.routeName: (context) => CreateServiceScreen(),
       },
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        textTheme: TextTheme(
+          titleLarge: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+      ),
     );
   }
 }
