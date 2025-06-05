@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:servicios_app/screens/details_screen.dart';
+import 'package:servicios_app/services/api.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,19 +28,47 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           //3. List Tile -> Lista los servicios
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.deepPurpleAccent,
-              backgroundImage: AssetImage("assets/image_general.png"),
-              child: Text("A"),
+          Expanded(
+            child: FutureBuilder(
+              future: getServices(),
+              builder: (context, snapshot) {
+                // retornar el widget a renderizar
+                //1. Estado de cargando
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                }
+                //2. Estado de error
+                if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                }
+                //3. Estado de éxito
+                if (!snapshot.hasData) {
+                  return Text("No hay datos disponibles");
+                }
+                final services = snapshot.data!.data;
+                return ListView.builder(
+                  // shrinkWrap: true,
+                  itemCount: services.length,
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  itemBuilder: (context, index) {
+                    final service = services[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.deepPurpleAccent,
+                        backgroundImage: NetworkImage(service.icon.url!),
+                        child: Text("A"),
+                      ),
+                      title: Text(service.name),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        /// Navegación por nombre "/details"
+                        Navigator.pushNamed(context, DetailsScreen.routeName);
+                      },
+                    );
+                  },
+                );
+              },
             ),
-            title: Text("Servicio 1"),
-            subtitle: Text("Descripción del servicio 1"),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              /// Navegación por nombre "/details"
-              Navigator.pushNamed(context, DetailsScreen.routeName);
-            },
           ),
         ],
       ),
