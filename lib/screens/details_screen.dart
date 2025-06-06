@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:servicios_app/models/services_models.dart';
+import 'package:servicios_app/notifiers/services_notifier.dart';
+import 'package:servicios_app/notifiers/theme_notifier.dart';
 import 'package:servicios_app/screens/create_service_screen.dart';
 
 class DetailsScreen extends StatelessWidget {
@@ -7,8 +11,33 @@ class DetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// obtener los argumentos de la ruta
+    final servicio = ModalRoute.of(context)?.settings.arguments as Service;
     return Scaffold(
-      appBar: AppBar(title: const Text("Detalles del Servicio")),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.read<ServicesNotifier>().fetchServices();
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text("Detalles del Servicio"),
+        actions: [
+          IconButton(
+            icon: Icon(
+              context.read<ThemeNotifier>().isDarkMode
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            onPressed: () {
+              context.read<ThemeNotifier>().isDarkMode = !context
+                  .read<ThemeNotifier>()
+                  .isDarkMode;
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -16,26 +45,20 @@ class DetailsScreen extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.asset(
-                "assets/image_general.png",
+              child: Image.network(
+                servicio.banner.url!,
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 16),
-             Text(
-              "Nombre del Servicio",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text(servicio.name, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
-            const Text(
-              "Descripción detallada del servicio. Aquí puedes incluir información relevante sobre el servicio ofrecido.",
-              style: TextStyle(fontSize: 16),
-            ),
+            Text(servicio.description, style: TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
-            const Text(
-              "Precio: \$100",
+            Text(
+              "Precio: \$${servicio.price}",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],

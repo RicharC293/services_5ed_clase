@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
+import 'package:servicios_app/notifiers/services_notifier.dart';
 import 'package:servicios_app/screens/details_screen.dart';
 import 'package:servicios_app/services/api.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   static const String routeName = "/";
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<ServicesNotifier>().fetchServices();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,44 +42,98 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           //3. List Tile -> Lista los servicios
+          // Expanded(
+          //   child: FutureBuilder(
+          //     future: getServices(),
+          //     builder: (context, snapshot) {
+          //       // retornar el widget a renderizar
+          //       //1. Estado de cargando
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return CircularProgressIndicator();
+          //       }
+          //       //2. Estado de error
+          //       if (snapshot.hasError) {
+          //         return Text("Error: ${snapshot.error}");
+          //       }
+          //       //3. Estado de éxito
+          //       if (!snapshot.hasData) {
+          //         return Text("No hay datos disponibles");
+          //       }
+          //       final services = snapshot.data!.data;
+          //       return ListView.builder(
+          //         // shrinkWrap: true,
+          //         itemCount: services.length,
+          //         padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          //         itemBuilder: (context, index) {
+          //           final service = services[index];
+          //           return ListTile(
+          //             leading: CircleAvatar(
+          //               backgroundColor: Colors.deepPurpleAccent,
+          //               backgroundImage: NetworkImage(service.icon.url!),
+          //               child: Text("A"),
+          //             ),
+          //             title: Text(service.name),
+          //             trailing: Icon(Icons.arrow_forward_ios),
+          //             onTap: () {
+          //               /// Navegación por nombre "/details"
+          //               Navigator.pushNamed(
+          //                 context,
+          //                 DetailsScreen.routeName,
+          //                 arguments: service,
+          //               );
+          //             },
+          //           );
+          //         },
+          //       );
+          //     },
+          //   ),
+          // ),
           Expanded(
-            child: FutureBuilder(
-              future: getServices(),
-              builder: (context, snapshot) {
-                // retornar el widget a renderizar
-                //1. Estado de cargando
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+            child: Consumer<ServicesNotifier>(
+              builder: (context, notifier, child) {
+                final services = notifier.services;
+                if (services == null) {
+                  return Center(
+                    child: CircularPercentIndicator(
+                      radius: 60.0,
+                      lineWidth: 5.0,
+                      percent: 1.0,
+                      center: Text("100%"),
+                      progressColor: Colors.green,
+                    ),
+                  );
                 }
-                //2. Estado de error
-                if (snapshot.hasError) {
-                  return Text("Error: ${snapshot.error}");
-                }
-                //3. Estado de éxito
-                if (!snapshot.hasData) {
-                  return Text("No hay datos disponibles");
-                }
-                final services = snapshot.data!.data;
-                return ListView.builder(
-                  // shrinkWrap: true,
-                  itemCount: services.length,
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  itemBuilder: (context, index) {
-                    final service = services[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.deepPurpleAccent,
-                        backgroundImage: NetworkImage(service.icon.url!),
-                        child: Text("A"),
-                      ),
-                      title: Text(service.name),
-                      trailing: Icon(Icons.arrow_forward_ios),
-                      onTap: () {
-                        /// Navegación por nombre "/details"
-                        Navigator.pushNamed(context, DetailsScreen.routeName);
-                      },
-                    );
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await notifier.fetchServices();
                   },
+                  child: ListView.builder(
+                    itemCount: services.length,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 16,
+                    ),
+                    itemBuilder: (context, index) {
+                      final service = services[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.deepPurpleAccent,
+                          backgroundImage: NetworkImage(service.icon.url!),
+                          child: const Text("A"),
+                        ),
+                        title: Text(service.name),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          /// Navegación por nombre "/details"
+                          Navigator.pushNamed(
+                            context,
+                            DetailsScreen.routeName,
+                            arguments: service,
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),
